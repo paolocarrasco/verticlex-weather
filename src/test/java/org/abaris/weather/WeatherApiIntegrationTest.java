@@ -13,20 +13,19 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-@WireMockTest(httpPort = 8081)
+@WireMockTest(httpsEnabled = true)
 @ExtendWith(RunTestOnContext.class)
 @ExtendWith(VertxExtension.class)
 class WeatherApiIntegrationTest {
 
     @BeforeEach
-    void setUp(Vertx vertx, VertxTestContext testContext) {
-        vertx.deployVerticle(new VWeatherApi(8081, "localhost")).onComplete(testContext.succeedingThenComplete());
+    void setUp(Vertx vertx, VertxTestContext testContext, WireMockRuntimeInfo wireMockRuntimeInfo) {
+        vertx.deployVerticle(new VWeatherApi(wireMockRuntimeInfo.getHttpsPort(), "localhost")).onComplete(testContext.succeedingThenComplete());
     }
 
     @Test
     @SuppressWarnings("JUnitMalformedDeclaration")
-    void testWeatherApi(Vertx vertx, VertxTestContext testContext, WireMockRuntimeInfo wireMockRuntimeInfo) {
-        wireMockRuntimeInfo.getHttpPort();
+    void testWeatherApi(Vertx vertx, VertxTestContext testContext) {
         vertx.createHttpClient().request(HttpMethod.GET, 8080, "localhost", "/weather?city=London&country=uk&units=metric&days=7")
                 .onSuccess(request -> request.send()
                         .onSuccess(response -> response.bodyHandler(body -> {

@@ -29,16 +29,14 @@ public class VWeatherApi extends AbstractVerticle {
                 .requestHandler(handleWeatherRequest())
                 .listen(8080);
     }
-
     private Handler<HttpServerRequest> handleWeatherRequest() {
         return request -> {
-            HttpRequest<Buffer> meteoReq = WebClient.create(vertx, new WebClientOptions().setTrustAll(true))
+            HttpRequest<Buffer> meteoReq = WebClient.create(vertx, new WebClientOptions().setTrustAll(true).setSsl(true).setVerifyHost(false))
                     .get(port, host, "/v1/forecast")
                     .addQueryParam("latitude", "51.51")
                     .addQueryParam("longitude", "-0.13")
                     .addQueryParam("hourly", "temperature_2m")
                     .addQueryParam("forecast_days", "1");
-//                    .ssl(true);
             meteoReq
                     .send()
                     .onSuccess(openMeteoResponse -> {
