@@ -30,7 +30,7 @@ class WeatherApiIntegrationTest {
 
     @Test
     void givenCityIsValidWhenWeatherEndpointIsHitThenItReturnsCurrentTemperature(Vertx vertx, VertxTestContext testContext) {
-        vertx.createHttpClient().request(HttpMethod.GET, applicationPort, "localhost", "/weather?city=London&country=UK&units=metric&days=7")
+        vertx.createHttpClient().request(HttpMethod.GET, applicationPort, "localhost", "/v1/weather?city=London&country=UK")
                 .onSuccess(request -> request.send()
                         .onSuccess(response -> response.bodyHandler(body -> {
                             var weatherForLondon = body.toJsonObject().mapTo(Weather.class);
