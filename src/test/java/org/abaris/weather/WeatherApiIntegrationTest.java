@@ -24,8 +24,7 @@ class WeatherApiIntegrationTest {
     }
 
     @Test
-    @SuppressWarnings("JUnitMalformedDeclaration")
-    void testWeatherApi(Vertx vertx, VertxTestContext testContext) {
+    void givenCityIsValidWhenWeatherEndpointIsHitThenItReturnsCurrentTemperature(Vertx vertx, VertxTestContext testContext) {
         vertx.createHttpClient().request(HttpMethod.GET, 8080, "localhost", "/weather?city=London&country=uk&units=metric&days=7")
                 .onSuccess(request -> request.send()
                         .onSuccess(response -> response.bodyHandler(body -> {
@@ -33,34 +32,8 @@ class WeatherApiIntegrationTest {
 
                             assertThat(weatherForLondon.latitude()).isEqualTo(51.55);
                             assertThat(weatherForLondon.longitude()).isEqualTo(-0.13);
+                            assertThat(weatherForLondon.temperature()).isEqualTo(19.3);
 
-                            assertThat(weatherForLondon.temperatures()).asList().hasSize(24)
-                                    .containsExactly(
-                                            11.0,
-                                            11.1,
-                                            11.0,
-                                            10.9,
-                                            10.7,
-                                            10.7,
-                                            10.4,
-                                            10.5,
-                                            10.8,
-                                            10.8,
-                                            11.2,
-                                            11.5,
-                                            14.2,
-                                            14.3,
-                                            14.5,
-                                            15.4,
-                                            14.6,
-                                            13.5,
-                                            13.0,
-                                            11.7,
-                                            10.3,
-                                            9.4,
-                                            8.8,
-                                            8.2
-                                    );
                             testContext.completeNow();
                         })));
     }
