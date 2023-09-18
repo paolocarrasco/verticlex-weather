@@ -11,17 +11,19 @@ public class VWeatherApi extends AbstractVerticle {
 
     private final int port;
     private final String host;
+    private final int applicationPort;
 
-    public VWeatherApi(int port, String host) {
-        this.port = port;
-        this.host = host;
+    public VWeatherApi(int applicationPort, int openMeteoPort, String openMeteoHost) {
+        this.port = openMeteoPort;
+        this.host = openMeteoHost;
+        this.applicationPort = applicationPort;
     }
 
     @Override
     public void start() {
         vertx.createHttpServer()
                 .requestHandler(handleWeatherRequest())
-                .listen(8080);
+                .listen(applicationPort);
     }
     private Handler<HttpServerRequest> handleWeatherRequest() {
         return request -> {

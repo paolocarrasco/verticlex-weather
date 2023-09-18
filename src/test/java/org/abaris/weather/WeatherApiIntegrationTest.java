@@ -11,6 +11,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import java.util.Random;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @WireMockTest(httpsEnabled = true)
@@ -18,14 +20,17 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @ExtendWith(VertxExtension.class)
 class WeatherApiIntegrationTest {
 
+    // random value to avoid port conflicts
+    private final int applicationPort = new Random().nextInt(1_000) + 10_000;
+
     @BeforeEach
     void setUp(Vertx vertx, VertxTestContext testContext, WireMockRuntimeInfo wireMockRuntimeInfo) {
-        vertx.deployVerticle(new VWeatherApi(wireMockRuntimeInfo.getHttpsPort(), "localhost")).onComplete(testContext.succeedingThenComplete());
+        vertx.deployVerticle(new VWeatherApi(applicationPort, wireMockRuntimeInfo.getHttpsPort(), "localhost")).onComplete(testContext.succeedingThenComplete());
     }
 
     @Test
     void givenCityIsValidWhenWeatherEndpointIsHitThenItReturnsCurrentTemperature(Vertx vertx, VertxTestContext testContext) {
-        vertx.createHttpClient().request(HttpMethod.GET, 8080, "localhost", "/weather?city=London&country=uk&units=metric&days=7")
+        vertx.createHttpClient().request(HttpMethod.GET, applicationPort, "localhost", "/weather?city=London&country=UK&units=metric&days=7")
                 .onSuccess(request -> request.send()
                         .onSuccess(response -> response.bodyHandler(body -> {
                             var weatherForLondon = body.toJsonObject().mapTo(Weather.class);

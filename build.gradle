@@ -1,6 +1,11 @@
 plugins {
+    id 'application'
     id 'java'
     id 'io.freefair.lombok' version '6.2.0'
+}
+
+application {
+    mainClass = 'org.abaris.weather.MainApp'
 }
 
 group = 'org.abaris'
