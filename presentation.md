@@ -36,9 +36,10 @@ Presentation of the project example
 -----------------------------------
 
 - This is a project based on some technologies we used at our previous client.
-- It is a Rest API for knowing the weather (present and forecast).
-- We will add a new endpoint for knowing the forecast weather of a city.
-- We will use TDD to develop it.
+- It is a Rest API for knowing the weather.
+- It uses the Open-Meteo API.
+- The location now is hardcoded.
+- We can obtain it from another API (GeoCoding API from [Open-Meteo](https://open-meteo.com/en/docs/geocoding-api))
 
 ---
 
