@@ -12,7 +12,7 @@ You can run the service locally:
     ./gradlew run
 ```
 
-Then you can access the service at http://localhost:8080/weather?city=Berlin&country=DE
+Then you can access the service at http://localhost:8080/v1/weather?city=Berlin&country=DE
 
 Test
 ----
