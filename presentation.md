@@ -38,6 +38,7 @@ Presentation of the project example
 - This is a project based on some technologies we used at our previous client.
 - It is a Rest API for knowing the weather (present and forecast).
 - We will add a new endpoint for knowing the forecast weather of a city.
+- We will use TDD to develop it.
 
 ---
 
@@ -52,7 +53,7 @@ Documenting
 Testing
 -------
 
-- We can do TDD with Copilot :-)
+- Copilot can help us to do TDD :-)
 - Let's create our test with Copilot!
 - Giving context on the style of testing
 - Hallucination is not bad!
