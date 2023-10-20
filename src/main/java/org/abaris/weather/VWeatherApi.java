@@ -1,8 +1,12 @@
 package org.abaris.weather;
 
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.Handler;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
+import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.client.WebClientOptions;
 
@@ -21,34 +25,47 @@ public class VWeatherApi extends AbstractVerticle {
     @Override
     public void start() {
         vertx.createHttpServer()
-                .requestHandler(handleWeatherRequest())
+                .requestHandler(handleWeatherApi())
                 .listen(applicationPort);
     }
 
-    private Router handleWeatherRequest() {
+    private Router handleWeatherApi() {
         Router router = Router.router(vertx);
 
-        router.route("/v1/weather").handler(ctx -> {
-
-            var meteoReq = WebClient.create(vertx, new WebClientOptions().setTrustAll(true).setSsl(true).setVerifyHost(false))
-                    .get(port, host, "/v1/forecast")
-                    .addQueryParam("latitude", "51.51")
-                    .addQueryParam("longitude", "-0.13")
-                    .addQueryParam("current_weather", "true");
-
-            meteoReq
-                    .send()
-                    .onSuccess(openMeteoResponse -> {
-                        var jsonObject = openMeteoResponse.bodyAsJsonObject();
-
-                        ctx.response().end(
-                                new JsonObject().put("latitude", jsonObject.getDouble("latitude"))
-                                        .put("longitude", jsonObject.getDouble("longitude"))
-                                        .put("temperature", jsonObject.getJsonObject("current_weather").getDouble("temperature")
-                                        ).encode());
-                    });
-        });
+        router.route("/v1/weather").handler(handleRetrievalCurrentWeatherEndpoint());
 
         return router;
+    }
+
+    private Handler<RoutingContext> handleRetrievalCurrentWeatherEndpoint() {
+        return context -> {
+            var openMeteoRequest = prepareRequestToOpenMeteo("51.51", "-0.13");
+
+            openMeteoRequest
+                    .send()
+                    .onSuccess(openMeteoResponse -> {
+                        var openMeteoJsonResponse = openMeteoResponse.bodyAsJsonObject();
+
+                        context.response()
+                                .putHeader("Content-Type", "application/json")
+                                .end(mapToResponseStructure(openMeteoJsonResponse));
+                    });
+        };
+    }
+
+    private static String mapToResponseStructure(JsonObject openMeteoJsonResponse) {
+        return new JsonObject()
+                .put("latitude", openMeteoJsonResponse.getDouble("latitude"))
+                .put("longitude", openMeteoJsonResponse.getDouble("longitude"))
+                .put("temperature", openMeteoJsonResponse.getJsonObject("current_weather").getDouble("temperature"))
+                .encode();
+    }
+
+    private HttpRequest<Buffer> prepareRequestToOpenMeteo(String latitude, String longitude) {
+        return WebClient.create(vertx, new WebClientOptions().setTrustAll(true).setSsl(true).setVerifyHost(false))
+                .get(port, host, "/v1/forecast")
+                .addQueryParam("latitude", latitude)
+                .addQueryParam("longitude", longitude)
+                .addQueryParam("current_weather", "true");
     }
 }
